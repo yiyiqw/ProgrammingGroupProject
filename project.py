@@ -1,88 +1,47 @@
-pip install pygame
-import pygame
 import random
-import time
 
-# Initialize Pygame
-pygame.init()
+def ask_question(question, correct_answer):
+    print(f"What is the capital of {question}?")
+    user_answer = input("Your answer: ").strip().capitalize()
 
-# Set up the game window
-width, height = 800, 600
-screen = pygame.display.set_mode((width, height))
-pygame.display.set_caption("Matching Game")
+    if user_answer == correct_answer:
+        print("Correct! You earned 1 point.")
+        return 1
+    else:
+        print(f"Wrong! The correct answer is {correct_answer}. No points earned.")
+        return 0
 
-# Set up colors
-white = (255, 255, 255)
-black = (0, 0, 0)
+countries_and_capitals = {
+    "Canada": "Ottawa",
+    "France": "Paris",
+    "Germany": "Berlin",
+    "Spain": "Madrid",
+    "China": "Beijing",
+    "Italy": "Rome",
+    "Australia": "Canberra",
+    "Austria": "Vienna",
+    "Chile": "Santiago",
+    "Cuba": "Havana",
+    "Norway": "Oslo"
+}
 
-# Set up the clock
-clock = pygame.time.Clock()
+questions = list(countries_and_capitals.keys())
+random.shuffle(questions)
 
-# Set up the font
-font = pygame.font.SysFont(None, 40)
+score = 0
+for question in questions:
+    score += ask_question(question, countries_and_capitals[question])
 
-# Set up the grid
-grid_size = 4
-card_size = 100
-cards = [i // 2 for i in range(grid_size**2)]  # Pairs of numbers
-random.shuffle(cards)
+percentage = (score / len(questions)) * 100
+print(f"\nYour final score is: {score} out of {len(questions)}. Your percentage is: {percentage}")
 
-# Set up card positions
-card_positions = [(x * card_size, y * card_size) for x in range(grid_size) for y in range(grid_size)]
-
-# Set up card state
-revealed = [False] * len(cards)
-selected = []
-
-# Main game loop
-game_over = False
-while not game_over:
-
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            game_over = True
-        elif event.type == pygame.MOUSEBUTTONDOWN and len(selected) < 2:
-            x, y = event.pos
-            card_x, card_y = x // card_size, y // card_size
-            index = card_y * grid_size + card_x
-
-            if not revealed[index]:
-                revealed[index] = True
-                selected.append(index)
-
-    # Draw the background
-    screen.fill(black)
-
-    # Draw the cards
-    for i, (x, y) in enumerate(card_positions):
-        pygame.draw.rect(screen, white, (x, y, card_size, card_size))
-
-        if revealed[i]:
-            text = font.render(str(cards[i]), True, black)
-            screen.blit(text, (x + card_size // 3, y + card_size // 3))
-
-    # Check for a match
-    if len(selected) == 2:
-        index1, index2 = selected
-        if cards[index1] != cards[index2]:
-            time.sleep(1)  # Delay to show the cards briefly
-            revealed[index1] = False
-            revealed[index2] = False
-        selected = []
-
-    # Check for game over
-    if all(revealed):
-        game_over_text = font.render("Congratulations! You won!", True, white)
-        screen.blit(game_over_text, (width // 4, height // 2))
-        pygame.display.flip()
-        time.sleep(2)
-        game_over = True
-
-    # Refresh the display
-    pygame.display.flip()
-
-    # Limit frames per second
-    clock.tick(30)
-
-# Quit Pygame
-pygame.quit()
+if percentage >= 90:
+    print("Congratulations! You excellent at this!")
+elif percentage >= 80:
+    print("Congratulations! You are quite good at this!.")
+elif percentage >= 70:
+    print("Congratulations! You are good at this.")
+elif percentage >= 50:
+    print("Congratulations! You passed.")
+else:
+    print("You have failed... Better luck next time :(")
